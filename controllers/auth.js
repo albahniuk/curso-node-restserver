@@ -1,7 +1,8 @@
 const { response, request } = require('express');
 const Usuario = require('../models/usuario');
 const { googleVerify } = require('../helpers/google-verify');
-
+const bcryptjs = require('bcryptjs')
+const { generarJWT } = require('../helpers/generar-jwt');
 const login = async(req, res = response) => {
 
     const { correo, password } = req.body;
@@ -23,7 +24,7 @@ const login = async(req, res = response) => {
         }
 
         // Verificar la constraseña
-        const validPassword = bcriptjs.compareSync( password, usuario.password );
+        const validPassword = bcryptjs.compareSync( password, usuario.password );
         if (!validPassword) {
             return res.status(400).json({
                 msg: "Usuario/Password no son correctos - password"
@@ -34,7 +35,8 @@ const login = async(req, res = response) => {
         const token = await generarJWT( usuario.id );
 
         res.json({
-            msg: 'login ok'
+            msg: 'login ok',
+            token
         })
     } catch (error) {
         console.log(error);
